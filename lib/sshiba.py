@@ -1284,14 +1284,15 @@ class SSHIBA(object):
         #Multilabel
         elif self.method[m_out] == 'mult': 
             #Expectation X
-            # m_x = np.dot(self.Z_mean, q.W[m_out]['mean'].T) + q.b[m_out]['mean']  
+            m_x = np.dot(self.Z_mean,q.W[m_out]['mean'].T) + q.b[m_out]['mean']     
             #Variance X
-            # var_x = q.tau_mean(m_out)**(-1)*np.eye(self.d[m_out]) + np.linalg.multi_dot([q.W[m_out]['mean'], Z_cov, q.W[m_out]['mean'].T])
+            var_x = q.tau_mean(m_out)**(-1)*np.eye(self.d[m_out]) + np.linalg.multi_dot([q.W[m_out]['mean'], Z_cov, q.W[m_out]['mean'].T])
             
-            p_t = np.zeros((n_pred,self.d[m_out]))
             #Probability t
+            p_t = np.zeros((n_pred,self.d[m_out]))
             for d in np.arange(self.d[m_out]):
-                p_t[:,d] = self.sigmoid(np.dot(self.Z_mean, q.W[m_out]['mean'].T) + q.b[m_out]['mean']  [:,d]*(1+math.pi/8*q.tau_mean(m_out)**(-1)*np.eye(self.d[m_out]) + np.linalg.multi_dot([q.W[m_out]['mean'], Z_cov, q.W[m_out]['mean'].T])[d,d])**(-0.5))
+                p_t[:,d] = self.sigmoid(m_x[:,d]*(1+math.pi/8*var_x[d,d])**(-0.5))
+            
             return p_t
        
     def HGamma(self, a, b):
